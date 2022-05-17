@@ -1,0 +1,1 @@
+web: gunicorn acqucoapp.wsgi --log-file -
