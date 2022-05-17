@@ -1,20 +1,22 @@
 from personapp.models import Person
 from personapp.serializers import PersonSerializer
 from django.http import Http404
+from rest_framework.pagination import PageNumberPagination
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
 
-class PersonList(APIView):
+class PersonList(APIView, PageNumberPagination):
     """
     List all snippets, or create a new person.
     """
     def get(self, request, format=None):
         persons = Person.objects.all()
-        serializer = PersonSerializer(persons, many=True)
-        return Response(serializer.data)
+        results = self.paginate_queryset(persons, request, view=self)
+        serializer = PersonSerializer(results, many=True)
+        return self.get_paginated_response(serializer.data)
 
     def post(self, request, format=None):
         serializer = PersonSerializer(data=request.data)
